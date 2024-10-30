@@ -3,8 +3,13 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
 #define PROXY "127.0.0.1"
-#define PROXY_PORT 9000
+#define PROXY_PORT 9050
+#define USERNAME "toruser"
 
 typedef unsigned char int8;
 typedef unsigned short int16;
@@ -16,7 +21,7 @@ typedef struct {
     int16 dst_port;
     int32 dst_ip;
     int8 user_id[8];
-}proxy_request;
+}ProxyRequest;
 
 
 typedef struct{
@@ -24,4 +29,7 @@ typedef struct{
     int8 cd;
     int16 dst_port; //ignored
     int32 dst_ip; // ignored
-}proxy_response;
+}ProxyResponse;
+
+ProxyRequest* create_request(const char*, const int);
+int main(int, char*[]);
