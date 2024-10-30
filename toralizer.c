@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    printf("Connected to the server %s:%d\n", PROXY, PROXY_PORT);
+    printf("Connected to proxy %s:%d\n", PROXY, PROXY_PORT);
 
     ProxyRequest* request = create_request(host, port);
 
@@ -74,6 +74,13 @@ int main(int argc, char *argv[]) {
     } 
     
     printf("Connected through proxy %s:%d\n", host, port);
+
+    char tmp[512] = "HEAD / HTTP/1.0\r\n\r\n";
+
+    write(proxy_sockfd, tmp, 512);
+
+    read(proxy_sockfd, tmp, 512);
+    printf("'%s'\n", tmp);
 
     close(proxy_sockfd);
     free(request);
