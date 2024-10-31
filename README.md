@@ -7,6 +7,9 @@ To use Toralize, simply prefix your command with toralize to proxy it through th
 ```bash
 $ toralize curl www.google.com
 ```
+```bash
+$ toralize ssh user@example.com
+```
 ## Prerequisites
 
 - **Tor**: Make sure Tor is installed and running on your system.
