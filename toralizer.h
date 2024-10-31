@@ -7,6 +7,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#include <dlfcn.h>
+
 #define PROXY "127.0.0.1"
 #define PROXY_PORT 9050
 #define USERNAME "toruser"
@@ -31,5 +33,6 @@ typedef struct{
     int32 dst_ip; // ignored
 }ProxyResponse;
 
-ProxyRequest* create_request(const char*, const int);
-int main(int, char*[]);
+ProxyRequest* create_request(struct sockaddr_in*);
+int connect(int, const struct sockaddr*,
+            socklen_t);

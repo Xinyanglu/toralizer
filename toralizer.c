@@ -1,31 +1,28 @@
 #include "toralizer.h"
 
-ProxyRequest* create_request(const char* dst_ip, const int dst_port) {
+ProxyRequest* create_request(struct sockaddr_in* server_address) {
     ProxyRequest* request = (ProxyRequest*)malloc(sizeof(ProxyRequest));
     request->vn = 4;
     request->cd = 1;
-    request->dst_port = htons(dst_port);
-    request->dst_ip = inet_addr(dst_ip);
+    request->dst_port = server_address->sin_port;
+    request->dst_ip = server_address->sin_addr.s_addr;
     strncpy(request->user_id, USERNAME, 8);
 
     return request;
 }
 
 
-int main(int argc, char *argv[]) {
+int connect(int original_sockfd, const struct sockaddr *original_address,
+            socklen_t addrlen){
     char* host;
-    int port;
-    if (argc < 3)
-    {
-        fprintf(stderr, "Usage: %s <host> <port> \n", argv[0]);
-        return -1;
-    }
-
-    host = argv[1];
-    port = atoi(argv[2]);
+    inet_ntop(AF_INET, &((struct sockaddr_in*)original_address)->sin_addr, host, INET_ADDRSTRLEN);
+    int port = ntohs(((struct sockaddr_in*)original_address)->sin_port);
 
     int proxy_sockfd;
-    struct sockaddr_in server_addr;
+    struct sockaddr_in proxy_server_address;
+    int (*original_connect)(int, const struct sockaddr*, socklen_t);
+
+    original_connect = dlsym(RTLD_NEXT, "connect");
 
     // Create socket to connect to proxy server
     if ((proxy_sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -33,11 +30,11 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(PROXY_PORT);
+    proxy_server_address.sin_family = AF_INET;
+    proxy_server_address.sin_port = htons(PROXY_PORT);
 
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, PROXY, &server_addr.sin_addr) <= 0) {
+    // Convert IPv4 address from text to binary form
+    if (inet_pton(AF_INET, PROXY, &proxy_server_address.sin_addr) <= 0) {
         fprintf(stderr, "Invalid proxy address/ Proxy address not supported\n");
         return -1;
     }
@@ -45,15 +42,14 @@ int main(int argc, char *argv[]) {
     printf("Socket created for %s:%d\n", PROXY, PROXY_PORT);
 
     // Connect to the proxy server
-    if (connect(proxy_sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+    if (original_connect(proxy_sockfd, (struct sockaddr *)&proxy_server_address, sizeof(proxy_server_address)) < 0) {
         fprintf(stderr, "Connection Failed\n");
         return -1;
     }
 
     printf("Connected to proxy %s:%d\n", PROXY, PROXY_PORT);
 
-    ProxyRequest* request = create_request(host, port);
-
+    ProxyRequest* request = create_request((struct sockaddr_in*)original_address);
 
     write(proxy_sockfd, request, sizeof(ProxyRequest));
 
@@ -73,16 +69,9 @@ int main(int argc, char *argv[]) {
         close(proxy_sockfd);
     } 
     
-    printf("Connected through proxy %s:%d\n", host, port);
+    printf("Connected through proxy to %s:%d\n", host, port);
+    dup2(proxy_sockfd, original_sockfd);
 
-    char tmp[512] = "HEAD / HTTP/1.0\r\n\r\n";
-
-    write(proxy_sockfd, tmp, 512);
-
-    read(proxy_sockfd, tmp, 512);
-    printf("'%s'\n", tmp);
-
-    close(proxy_sockfd);
     free(request);
     
     return 0;
