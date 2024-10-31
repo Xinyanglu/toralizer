@@ -11,7 +11,7 @@ $ toralize curl www.google.com
 
 - **Tor**: Make sure Tor is installed and running on your system.
 - Download and compile the project.
-- Move the bash script to your /usr/bin directory and point LD_EXPORT to the compiled binary's location.
+- Move the bash script to your bin directory and point LD_EXPORT to the compiled binary's location.
 - Change the proxy port in toralizer.h to match your Tor port (default is 9050).
 
 ## Note
