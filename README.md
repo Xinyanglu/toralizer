@@ -1,6 +1,6 @@
 # Toralize
 
-**Toralize** is a command-line utility that enhances application privacy by proxying requests through the Tor network using SOCKS version 4. This tool requires the Tor software to be installed and configured on your system.
+**Toralize** is a command-line utility that enhances application privacy by proxying requests through the Tor network using SOCKS protocol version 4. This tool requires the Tor software to be installed and configured on your system.
 
 ## Usage
 To use Toralize, simply prefix your command with toralize to proxy it through the Tor network.
