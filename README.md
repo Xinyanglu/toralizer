@@ -17,3 +17,7 @@ $ toralize ssh user@example.com
 
 ## Note
 Some servers may block or limit access to requests coming from the Tor network.
+
+## Next steps
+- Implement SOCKS version 5
+- Anonymize DNS resolution
