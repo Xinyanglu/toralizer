@@ -14,7 +14,7 @@ ProxyRequest* create_request(struct sockaddr_in* server_address) {
 
 int connect(int original_sockfd, const struct sockaddr *original_address,
             socklen_t addrlen){
-    char* host;
+    char host[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &((struct sockaddr_in*)original_address)->sin_addr, host, INET_ADDRSTRLEN);
     int port = ntohs(((struct sockaddr_in*)original_address)->sin_port);
 
