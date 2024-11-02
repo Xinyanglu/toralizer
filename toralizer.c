@@ -67,6 +67,7 @@ int connect(int original_sockfd, const struct sockaddr *original_address,
         fprintf(stderr, "Unable to connect through proxy. Error code: %d\n", response.cd);
         free(request);
         close(proxy_sockfd);
+        return -1;
     } 
     
     printf("Connected through proxy to %s:%d\n", host, port);
